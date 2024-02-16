@@ -89,17 +89,17 @@ def main():
     uuid = sl.CameraIdentifier(zed.get_camera_information().serial_number)
     fusion.subscribe(uuid,configuration,sl.Transform(0,0,0))
     # Enable positional tracking for Fusion object
+    gnss_calibration_parameters = sl.GNSSCalibrationParameters()
+    gnss_calibration_parameters.target_yaw_uncertainty = 0.1
+    gnss_calibration_parameters.enable_translation_uncertainty_target = False
+    gnss_calibration_parameters.target_translation_uncertainty = 10e-2
+    gnss_calibration_parameters.enable_reinitialization = True
+    gnss_calibration_parameters.gnss_vio_reinit_threshold = 5
+    gnss_calibration_parameters.enable_rolling_calibration = True
     positional_tracking_fusion_parameters = sl.PositionalTrackingFusionParameters()
-    positional_tracking_fusion_parameters.enable_GNSS_fusion = True 
-    gnss_calibration_parameters = {
-                "target_yaw_uncertainty" : 0.1,
-        "enable_translation_uncertainty_target" : False,
-        "target_translation_uncertainty" : 10e-2,
-        "enable_reinitialization" : True,
-        "gnss_vio_reinit_threshold" : 5,
-        "enable_rolling_calibration" : True
-    }
-    fusion.enable_positionnal_tracking({"gnss_calibration_parameters" : gnss_calibration_parameters , "enable_GNSS_fusion" : True})
+    positional_tracking_fusion_parameters.enable_GNSS_fusion = True
+    positional_tracking_fusion_parameters.gnss_calibration_parameters = gnss_calibration_parameters
+    fusion.enable_positionnal_tracking(positional_tracking_fusion_parameters)
     # Setup viewer:
     viewer = GenericDisplay()
     viewer.init(zed.get_camera_information().camera_model)
